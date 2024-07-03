@@ -1,18 +1,21 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
-require('dotenv').config()
 const mongoose = require('mongoose');
+require('dotenv').config()
+
+const User = require('./models/User');
 
 // Mongo Atlas Connection
-mongoose.connect(process.env.CONN_STRING).
-  catch(error => console.log(error))
+mongoose.connect(process.env.CONN_STRING, {dbName:'exercisetracker'})
+  .then(() => console.log('Mongodb Connection Success!'))
+  .catch((e) => console.error('Mongodb Connection Failed!', error))
 
 
 
 app.use(cors())
 app.use(express.static('public'))
-app.get('/', (req, res) => {
+app.get('/', async(req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
