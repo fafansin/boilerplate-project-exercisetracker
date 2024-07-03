@@ -2,12 +2,22 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 require('dotenv').config()
+const mongoose = require('mongoose');
+
+// Mongo Atlas Connection
+mongoose.connect(process.env.CONN_STRING).
+  catch(error => console.log(error))
+
+
 
 app.use(cors())
 app.use(express.static('public'))
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
+
+
+
 
 
 
