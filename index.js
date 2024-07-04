@@ -63,9 +63,30 @@ app.post('/api/users/:id/exercises', async (req, res)=> {
 app.get('/api/users/:id/logs', async (req, res) => {
   const { from, to, limit } = req.query;
   const {id} = req.params;
-  const ref = await User.find({});
   
-  res.send({data:ref})
+  const filter = { person:id }
+  const all = await Exercise.find(filter, 'description').populate('person', 'username');
+  
+  if(from && to){
+    filter.date = {$gte:new Date(from), $lte: new Date(to)}
+  }else if(from){
+    filter.date = {$gte: new Date(from)}
+  }else if(to){
+    filter.date = {$lte: new Date(to)}
+  }
+  
+  const exercises = await Exercise.find(filter).limit(limit ? limit : 0);
+
+  const logs = exercises.map(item => {
+    return {description:item.description, duration:item.duration, date:item.date.toDateString()}
+  })
+  
+  res.json({
+    username:all[0].person.username,
+    count:all.length,
+    _id:id,
+    log:logs
+  });
 })
 
 const listener = app.listen(process.env.PORT || 3000, () => {
