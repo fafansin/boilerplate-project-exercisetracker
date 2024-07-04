@@ -30,7 +30,7 @@ app.post('/api/users', async (req, res) => {
 
 app.get('/api/users', async (req, res) => {
   // const ref = await User.find({}, 'username');
-  const ref = await User.find({});
+  const ref = await User.find({}).limit(3);
   res.json(ref);
 })
 
@@ -59,6 +59,14 @@ app.post('/api/users/:id/exercises', async (req, res)=> {
     date:exercise.date.toDateString(),
     _id:user._id
   })
+})
+
+app.get('/api/users/:id/logs', async (req, res) => {
+  const { from, to, limit } = req.query;
+  const {id} = req.params;
+  const ref = await User.find({});
+  
+  res.send({data:ref})
 })
 
 
