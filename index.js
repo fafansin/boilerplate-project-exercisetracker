@@ -64,6 +64,8 @@ app.get('/api/users/:id/logs', async (req, res) => {
   const { from, to, limit } = req.query;
   const {id} = req.params;
   
+  const user = await User.findById(id);
+
   const filter = { person:id }
   const all = await Exercise.find(filter, 'description').populate('person', 'username');
   
@@ -82,9 +84,11 @@ app.get('/api/users/:id/logs', async (req, res) => {
   })
   
   res.json({
-    username:all[0].person.username,
-    count:all.length,
     _id:id,
+    username:user.username,
+    count:logs.length,
+    ...(from && {from:new Date(from).toDateString()}),
+    ...(to && {to:new Date(to).toDateString()}),
     log:logs
   });
 })
