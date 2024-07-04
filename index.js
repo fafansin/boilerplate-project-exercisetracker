@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 require('dotenv').config()
 
 const User = require('./models/user');
+const Exercise = require('./models/exercise');
 
 // Mongo Atlas Connection
 mongoose.connect(process.env.CONN_STRING, {dbName:'exercisetracker'})
@@ -29,8 +30,7 @@ app.post('/api/users', async (req, res) => {
 })
 
 app.get('/api/users', async (req, res) => {
-  // const ref = await User.find({}, 'username');
-  const ref = await User.find({}).limit(3);
+  const ref = await User.find({}, 'username');
   res.json(ref);
 })
 
@@ -43,14 +43,13 @@ app.post('/api/users/:id/exercises', async (req, res)=> {
     return res.json({error:"User nor found"});
   }
   // Form exercise obj
-  const exercise = {
+  const exercise = await Exercise.create({
     description:description,
     duration:parseInt(duration),
-    date:date ? new Date(date) : new Date()
-  }
-
-  user.exercises.push(exercise)
-  const ref = await user.save();
+    date:date ? new Date(date) : new Date(),
+    person:user._id
+  })
+  
   
   res.json({
     username:user.username, 
@@ -68,10 +67,6 @@ app.get('/api/users/:id/logs', async (req, res) => {
   
   res.send({data:ref})
 })
-
-
-
-
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
